@@ -1,404 +1,234 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Administración - Restaurante</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú Digital - Restaurante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-4 md:p-8">
+<body class="bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white min-h-screen p-4 md:p-8">
 
-  <div class="max-w-7xl mx-auto space-y-8">
-    
-    <!-- Encabezado Principal -->
-    <header class="bg-gray-800 p-6 rounded-2xl border border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
-      <div>
-        <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
-          <i class="fa-solid fa-user-shield"></i> Panel de Administración y POS
-        </h1>
-        <p class="text-xs text-gray-400 mt-1">Gestión integral de ventas, pedidos, inventario y contabilidad</p>
-      </div>
-      <div class="flex gap-2">
-        <span class="bg-emerald-500/10 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-full border border-emerald-500/20 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sincronizado con Pedidos
-        </span>
-      </div>
-    </header>
+    <div class="max-w-5xl mx-auto space-y-8">
+        
+        <!-- Encabezado -->
+        <header class="bg-gradient-to-r from-amber-600/20 via-gray-800 to-gray-900 p-6 rounded-2xl border border-amber-500/30 shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <span class="bg-amber-500/10 text-amber-400 font-semibold px-3 py-1 rounded-full text-xs uppercase tracking-wider border border-amber-500/20">
+                    <i class="fa-solid fa-fire mr-1"></i> Pedidos Online
+                </span>
+                <h1 class="text-3xl md:text-4xl font-extrabold mt-2 text-white tracking-tight">Restaurante Gourmet</h1>
+                <p class="text-gray-400 text-sm mt-1">Elige tus platillos favoritos y recíbelos al instante</p>
+            </div>
+            
+            <!-- Selector de Moneda -->
+            <div class="bg-gray-900/80 p-3 rounded-2xl border border-gray-700/60 flex items-center gap-3">
+                <span class="text-xs text-gray-400 font-bold uppercase tracking-wider"><i class="fa-solid fa-coins text-amber-400 mr-1"></i> Moneda:</span>
+                <select id="currency-select" onchange="changeCurrency()" class="bg-gray-800 text-amber-400 font-bold text-sm px-3 py-1.5 rounded-xl border border-gray-600 focus:outline-none focus:border-amber-500">
+                    <option value="USD">Dólares ($ USD)</option>
+                    <option value="COP">Pesos ($ COP)</option>
+                    <option value="VES">Bolívares (Bs VES)</option>
+                </select>
+            </div>
+        </header>
 
-    <!-- METRICAS Y CONTABILIDAD DEL DÍA -->
-    <section class="space-y-4">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-        <h2 class="text-xl font-bold flex items-center gap-2">
-          <i class="fa-solid fa-calculator text-emerald-400"></i> Contabilidad del Día
-        </h2>
-        <div class="flex flex-wrap gap-2">
-          <button onclick="editAccounting()" class="bg-gray-800 hover:bg-gray-700 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-400 transition flex items-center gap-1">
-            <i class="fa-solid fa-pen-to-square"></i> Modificar Montos
-          </button>
-          <button onclick="resetDailyAccounting()" class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/20 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1">
-            <i class="fa-solid fa-rotate-right"></i> Reiniciar Día y Gráfica Diaria
-          </button>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Catálogo de Productos -->
+            <div class="lg:col-span-2 space-y-4">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-amber-400">
+                    <i class="fa-solid fa-utensils"></i> Nuestro Menú
+                </h2>
+                <div id="catalog-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Productos renderizados dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Carrito de Compras -->
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold flex items-center gap-2 text-amber-400">
+                    <i class="fa-solid fa-cart-shopping"></i> Tu Pedido
+                </h2>
+                <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-5 shadow-2xl space-y-4 sticky top-6">
+                    <div id="cart-items" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                        <!-- Items del carrito -->
+                    </div>
+
+                    <div class="border-t border-gray-800 pt-4 space-y-3">
+                        <div class="flex justify-between items-center text-gray-400 text-sm">
+                            <span>Total estimado:</span>
+                            <span id="cart-total" class="text-2xl font-black text-emerald-400">$0.00</span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-400 font-semibold uppercase">Notas o Mesa del cliente:</label>
+                            <input type="text" id="client-info" placeholder="Ej: Mesa 4 / Para llevar" class="w-full bg-gray-800 text-sm border border-gray-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-amber-500">
+                        </div>
+
+                        <button onclick="sendOrderToAPI()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-gray-950 font-black py-3 rounded-xl shadow-lg transition duration-200 transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Confirmar y Enviar Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
-          <p class="text-xs text-gray-400 font-semibold uppercase">Dinero Obtenido Hoy</p>
-          <p id="total-revenue" class="text-3xl font-extrabold text-emerald-400 mt-2">$0.00</p>
-        </div>
-        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
-          <p class="text-xs text-gray-400 font-semibold uppercase">Ventas Realizadas Hoy</p>
-          <p id="total-sales-count" class="text-3xl font-extrabold text-amber-400 mt-2">0</p>
-        </div>
-        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700">
-          <p class="text-xs text-gray-400 font-semibold uppercase">Fondo de Caja Chica</p>
-          <p id="petty-cash" class="text-3xl font-extrabold text-blue-400 mt-2">$50.00</p>
-        </div>
-      </div>
+    <script>
+        const defaultMenu = [
+            { id: 1, name: "Hamburguesa Doble Carne", price: 8.50, category: "Comidas", stock: 25 },
+            { id: 2, name: "Pizza Pepperoni Especial", price: 12.00, category: "Comidas", stock: 15 },
+            { id: 3, name: "Papas Fritas Gourmet", price: 3.50, category: "Comidas", stock: 30 },
+            { id: 4, name: "Refresco Cola 500ml", price: 1.50, category: "Bebidas", stock: 50 }
+        ];
 
-      <!-- Gráfica Diaria -->
-      <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-        <h3 class="text-sm font-bold text-gray-400 mb-4">Flujo de Ingresos del Día (Por Horas)</h3>
-        <div class="h-48 w-full">
-          <canvas id="salesChart"></canvas>
-        </div>
-      </div>
-    </section>
+        let inventory = [];
+        let cart = [];
+        let currentCurrency = 'USD';
+        const rates = { USD: 1, COP: 4100, VES: 36.5 };
 
-    <!-- CONTABILIDAD Y GRÁFICA SEMANAL -->
-    <section class="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-6">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-gray-700 pb-3">
-        <div>
-          <h2 class="text-xl font-bold flex items-center gap-2 text-amber-400">
-            <i class="fa-solid fa-chart-line"></i> Estudio y Comportamiento Semanal
-          </h2>
-          <p class="text-xs text-gray-400">Análisis de ingresos por día de la semana</p>
-        </div>
-        <div class="text-right">
-          <p class="text-xs text-gray-400">Total Acumulado:</p>
-          <p id="week-total" class="text-lg font-extrabold text-emerald-400">$0.00</p>
-        </div>
-      </div>
+        // Canal de transmisión para sincronización en vivo
+        const apiChannel = new BroadcastChannel('restaurante_api_channel');
 
-      <div class="grid grid-cols-2 md:grid-cols-7 gap-3" id="week-days-container"></div>
-
-      <div class="bg-gray-900 p-4 rounded-xl border border-gray-700">
-        <h3 class="text-xs font-bold text-gray-400 mb-2 uppercase">Tendencia de Ventas de la Semana</h3>
-        <div class="h-44 w-full">
-          <canvas id="weekChart"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- VISOR DE PEDIDOS -->
-    <section class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-      <h2 class="text-xl font-bold border-b border-gray-700 pb-3 mb-4 flex items-center gap-2 text-amber-400">
-        <i class="fa-solid fa-bell"></i> Pedidos Entrantes en Tiempo Real
-      </h2>
-      <div id="incoming-orders" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <p class="text-gray-500 text-sm italic col-span-full">No hay pedidos entrantes por el momento.</p>
-      </div>
-    </section>
-
-    <!-- GESTIÓN DE INVENTARIO -->
-    <section class="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-4">
-      <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 border-b border-gray-700 pb-4">
-        <div>
-          <h2 class="text-xl font-bold flex items-center gap-2">
-            <i class="fa-solid fa-boxes-stacked text-amber-400"></i> Gestión de Inventario
-          </h2>
-          <p class="text-xs text-gray-400">Haz clic en la 'X' roja para eliminar un producto</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <input type="text" id="new-item-name" placeholder="Nombre" class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white">
-          <input type="number" id="new-item-price" placeholder="Precio ($)" class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white w-24">
-          <input type="number" id="new-item-stock" placeholder="Stock" class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white w-20">
-          <button onclick="addInventoryItem()" class="bg-amber-500 hover:bg-amber-400 text-gray-900 font-bold px-3 py-1.5 rounded-lg text-xs transition">
-            + Agregar
-          </button>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-gray-900/50 text-gray-400 text-xs uppercase border-b border-gray-700">
-            <tr>
-              <th class="p-3">Producto</th>
-              <th class="p-3">Categoría</th>
-              <th class="p-3">Precio</th>
-              <th class="p-3">Stock</th>
-              <th class="p-3 text-center">Quitar</th>
-            </tr>
-          </thead>
-          <tbody id="inventory-table-body" class="divide-y divide-gray-700/50"></tbody>
-        </table>
-      </div>
-    </section>
-
-  </div>
-
-  <script>
-    const apiChannel = new BroadcastChannel('restaurante_api_channel');
-
-    let revenue = Number(localStorage.getItem('rest_revenue')) || 0.00;
-    let salesCount = Number(localStorage.getItem('rest_salesCount')) || 0;
-    let pettyCash = Number(localStorage.getItem('rest_pettyCash')) || 50.00;
-    let orders = [];
-
-    let weekData = JSON.parse(localStorage.getItem('rest_weekData')) || [
-      { day: "Lunes", total: 0 },
-      { day: "Martes", total: 0 },
-      { day: "Miércoles", total: 0 },
-      { day: "Jueves", total: 0 },
-      { day: "Viernes", total: 0 },
-      { day: "Sábado", total: 0 },
-      { day: "Domingo", total: 0 }
-    ];
-
-    let inventory = JSON.parse(localStorage.getItem('rest_inventory')) || [
-      { id: 1, name: "Hamburguesa Doble Carne", price: 8.50, category: "Comidas", stock: 25 },
-      { id: 2, name: "Pizza Pepperoni Especial", price: 12.00, category: "Comidas", stock: 15 },
-      { id: 3, name: "Papas Fritas Gourmet", price: 3.50, category: "Comidas", stock: 30 },
-      { id: 4, name: "Refresco Cola 500ml", price: 1.50, category: "Bebidas", stock: 50 }
-    ];
-
-    let chartDataValues = JSON.parse(localStorage.getItem('rest_chartData')) || [0, 0, 0, 0, 0, 0];
-
-    let salesChart, weekChart;
-
-    function initCharts() {
-      const ctx1 = document.getElementById('salesChart').getContext('2d');
-      salesChart = new Chart(ctx1, {
-        type: 'line',
-        data: {
-          labels: ['12 PM', '2 PM', '4 PM', '6 PM', '8 PM', '10 PM'],
-          datasets: [{
-            label: 'Ventas ($)',
-            data: chartDataValues,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      });
-
-      const ctx2 = document.getElementById('weekChart').getContext('2d');
-      weekChart = new Chart(ctx2, {
-        type: 'bar',
-        data: {
-          labels: weekData.map(d => d.day),
-          datasets: [{
-            label: 'Total ($)',
-            data: weekData.map(d => d.total),
-            backgroundColor: '#f59e0b',
-            borderRadius: 6
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      });
-    }
-
-    function saveState() {
-      localStorage.setItem('rest_revenue', revenue);
-      localStorage.setItem('rest_salesCount', salesCount);
-      localStorage.setItem('rest_pettyCash', pettyCash);
-      localStorage.setItem('rest_chartData', JSON.stringify(salesChart.data.datasets[0].data));
-      localStorage.setItem('rest_weekData', JSON.stringify(weekData));
-    }
-
-    function updateAccountingUI() {
-      document.getElementById('total-revenue').innerText = `$${revenue.toFixed(2)}`;
-      document.getElementById('total-sales-count').innerText = salesCount;
-      document.getElementById('petty-cash').innerText = `$${pettyCash.toFixed(2)}`;
-
-      const weekContainer = document.getElementById('week-days-container');
-      let weekTotal = 0;
-
-      weekContainer.innerHTML = weekData.map((d, index) => {
-        weekTotal += d.total;
-        return `
-          <div class="bg-gray-900/60 p-3 rounded-xl border border-gray-700/60 text-center">
-            <p class="text-xs text-gray-400 font-semibold">${d.day}</p>
-            <p class="text-sm font-bold text-emerald-400 mt-1">$${d.total.toFixed(2)}</p>
-            <button onclick="editDayTotal(${index})" class="mt-2 text-[10px] text-amber-400 hover:underline">Editar</button>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('week-total').innerText = `$${weekTotal.toFixed(2)}`;
-
-      if (weekChart) {
-        weekChart.data.datasets[0].data = weekData.map(d => d.total);
-        weekChart.update();
-      }
-
-      saveState();
-    }
-
-    function editDayTotal(index) {
-      const val = prompt(`Ingresa el total para ${weekData[index].day} ($):`, weekData[index].total);
-      if (val !== null && !isNaN(parseFloat(val))) {
-        weekData[index].total = parseFloat(val);
-        updateAccountingUI();
-      }
-    }
-
-    function editAccounting() {
-      const newRev = prompt('Ingresa el dinero obtenido total ($):', revenue);
-      const newSales = prompt('Ingresa la cantidad de ventas en el día:', salesCount);
-      const newCash = prompt('Ingresa el monto de caja chica ($):', pettyCash);
-
-      if (newRev !== null && !isNaN(parseFloat(newRev))) revenue = parseFloat(newRev);
-      if (newSales !== null && !isNaN(parseInt(newSales))) salesCount = parseInt(newSales);
-      if (newCash !== null && !isNaN(parseFloat(newCash))) pettyCash = parseFloat(newCash);
-
-      updateAccountingUI();
-    }
-
-    function resetDailyAccounting() {
-      if (confirm('¿Reiniciar la contabilidad y la gráfica de hoy? (Esto dejará los valores del día en $0 sin borrar la semana)')) {
-        revenue = 0.00;
-        salesCount = 0;
-        salesChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0];
-        salesChart.update();
-        updateAccountingUI();
-        alert('Contabilidad del día reiniciada con éxito.');
-      }
-    }
-
-    function renderInventory() {
-      const tbody = document.getElementById('inventory-table-body');
-      tbody.innerHTML = inventory.map(item => `
-        <tr class="hover:bg-gray-800/50 transition">
-          <td class="p-3 font-bold">${item.name}</td>
-          <td class="p-3 text-gray-400">${item.category || 'General'}</td>
-          <td class="p-3 text-emerald-400 font-bold">$${Number(item.price).toFixed(2)}</td>
-          <td class="p-3 font-semibold ${item.stock <= 5 ? 'text-red-400' : 'text-gray-200'}">${item.stock} unidades</td>
-          <td class="p-3 text-center">
-            <button onclick="removeInventoryItem('${item.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 font-bold w-7 h-7 rounded-lg transition text-xs flex items-center justify-center mx-auto">
-              ✕
-            </button>
-          </td>
-        </tr>
-      `).join('');
-      
-      localStorage.setItem('rest_inventory', JSON.stringify(inventory));
-      apiChannel.postMessage({ type: 'INVENTORY_UPDATED', payload: inventory });
-      localStorage.setItem('rest_inventory_sync', JSON.stringify({ timestamp: Date.now(), payload: inventory }));
-    }
-
-    function removeInventoryItem(id) {
-      if (confirm('¿Seguro que deseas eliminar este producto del inventario?')) {
-        inventory = inventory.filter(item => String(item.id) !== String(id));
-        renderInventory();
-      }
-    }
-
-    function addInventoryItem() {
-      const name = document.getElementById('new-item-name').value.trim();
-      const price = parseFloat(document.getElementById('new-item-price').value);
-      const stock = parseInt(document.getElementById('new-item-stock').value);
-      
-      if (!name || isNaN(price) || isNaN(stock)) return alert('Completa los campos correctamente');
-      
-      const newItem = {
-        id: 'id_' + Date.now(),
-        name: name,
-        price: price,
-        category: 'General',
-        stock: stock
-      };
-
-      inventory.push(newItem);
-      renderInventory();
-      
-      document.getElementById('new-item-name').value = '';
-      document.getElementById('new-item-price').value = '';
-      document.getElementById('new-item-stock').value = '';
-    }
-
-    function renderOrders() {
-      const container = document.getElementById('incoming-orders');
-      if (orders.length === 0) {
-        container.innerHTML = `<p class="text-gray-500 text-sm italic col-span-full">No hay pedidos entrantes.</p>`;
-        return;
-      }
-      container.innerHTML = orders.map(ord => `
-        <div class="bg-gray-900 p-4 rounded-xl border ${ord.status === 'Completado' ? 'border-gray-700 opacity-60' : 'border-amber-500/50'} space-y-3">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-amber-400">${ord.client}</span>
-            <span class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full">Moneda: ${ord.currency}</span>
-          </div>
-          <div class="text-xs space-y-1 text-gray-300">
-            ${ord.items.map(i => `<div>- ${i.name} x${i.qty}</div>`).join('')}
-          </div>
-          <div class="flex justify-between items-center border-t border-gray-800 pt-2">
-            <span class="font-bold text-emerald-400 text-sm">$${ord.total.toFixed(2)}</span>
-            ${ord.status === 'Pendiente' ? `
-              <button onclick="processOrder(${ord.id})" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition">
-                Cobrar y Descontar
-              </button>
-            ` : `<span class="text-xs text-gray-400 italic">Cobrado</span>`}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function processOrder(orderId) {
-      const ord = orders.find(o => o.id === orderId);
-      if (!ord || ord.status === 'Completado') return;
-
-      ord.items.forEach(item => {
-        const invItem = inventory.find(i => String(i.id) === String(item.id));
-        if (invItem) invItem.stock = Math.max(0, invItem.stock - item.qty);
-      });
-
-      revenue += ord.total;
-      salesCount += 1;
-      ord.status = 'Completado';
-
-      const chartDataset = salesChart.data.datasets[0].data;
-      chartDataset[chartDataset.length - 1] += ord.total;
-      salesChart.update();
-
-      weekData[5].total += ord.total;
-
-      updateAccountingUI();
-      renderInventory();
-      renderOrders();
-    }
-
-    // Puente dual de sincronización de pedidos
-    apiChannel.onmessage = (event) => {
-      if (event.data.type === 'NEW_ORDER') {
-        if (!orders.some(o => o.id === event.data.payload.id)) {
-          orders.unshift(event.data.payload);
-          renderOrders();
+        function loadInventory() {
+            const stored = localStorage.getItem('rest_inventory');
+            inventory = stored ? JSON.parse(stored) : defaultMenu;
+            renderCatalog();
         }
-      }
-    };
 
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'rest_last_order_trigger') {
-        try {
-          const data = JSON.parse(event.newValue);
-          if (data && data.payload) {
-            if (!orders.some(o => o.id === data.payload.id)) {
-              orders.unshift(data.payload);
-              renderOrders();
+        function formatPrice(usdPrice) {
+            if (currentCurrency === 'COP') return `$${(usdPrice * rates.COP).toLocaleString()} COP`;
+            if (currentCurrency === 'VES') return `Bs ${(usdPrice * rates.VES).toFixed(2)}`;
+            return `$${usdPrice.toFixed(2)} USD`;
+        }
+
+        function changeCurrency() {
+            currentCurrency = document.getElementById('currency-select').value;
+            renderCatalog();
+            renderCart();
+        }
+
+        function renderCatalog() {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = inventory.map(item => `
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col justify-between hover:border-gray-700 transition">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-gray-800 text-amber-400 border border-amber-500/20">${item.category}</span>
+                        <h3 class="font-bold text-lg mt-2 text-white">${item.name}</h3>
+                        <p class="text-emerald-400 font-extrabold text-lg mt-1">${formatPrice(item.price)}</p>
+                        <p class="text-xs text-gray-400 mt-1">Disponibles: ${item.stock}</p>
+                    </div>
+                    <button onclick="addToCart(${item.id})" class="mt-4 w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 font-bold py-2 rounded-xl border border-amber-500/30 transition flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-cart-plus"></i> Agregar
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const item = inventory.find(p => p.id === id);
+            if (!item || item.stock <= 0) return alert('Producto agotado');
+
+            const cartItem = cart.find(c => c.id === id);
+            if (cartItem) {
+                cartItem.qty++;
+            } else {
+                cart.push({ ...item, qty: 1 });
             }
-          }
-        } catch (e) {}
-      }
-    });
+            renderCart();
+        }
 
-    initCharts();
-    renderInventory();
-    updateAccountingUI();
-  </script>
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Tu carrito está vacío</p>';
+                document.getElementById('cart-total').innerText = formatPrice(0);
+                return;
+            }
+
+            let totalUSD = 0;
+            container.innerHTML = cart.map(item => {
+                totalUSD += item.price * item.qty;
+                return `
+                    <div class="flex justify-between items-center bg-gray-800/50 p-2.5 rounded-xl border border-gray-700/50">
+                        <div>
+                            <p class="font-semibold text-sm text-white">${item.name}</p>
+                            <p class="text-xs text-emerald-400 font-bold">${formatPrice(item.price)} x ${item.qty}</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-6 h-6 bg-gray-700 text-white rounded-lg flex items-center justify-center text-xs font-bold">-</button>
+                            <span class="text-xs font-bold px-1">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-6 h-6 bg-gray-700 text-white rounded-lg flex items-center justify-center text-xs font-bold">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cart-total').innerText = formatPrice(totalUSD);
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(c => c.id === id);
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(c => c.id !== id);
+            }
+            renderCart();
+        }
+
+        function sendOrderToAPI() {
+            if (cart.length === 0) return alert('El carrito está vacío');
+            
+            const info = document.getElementById('client-info').value.trim() || 'Cliente General';
+            const totalUSD = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+
+            const newOrder = {
+                id: Date.now(),
+                client: info,
+                currency: currentCurrency,
+                items: [...cart],
+                total: totalUSD,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                status: 'Pendiente'
+            };
+
+            // 1. Enviar por canal en vivo
+            apiChannel.postMessage({ type: 'NEW_ORDER', payload: newOrder });
+
+            // 2. Guardar en localStorage sincronizado
+            let currentOrders = JSON.parse(localStorage.getItem('rest_orders')) || [];
+            currentOrders.push(newOrder);
+            localStorage.setItem('rest_orders', JSON.stringify(currentOrders));
+
+            // 3. Disparador de evento para otras pestañas
+            localStorage.setItem('rest_last_order_trigger', JSON.stringify({ timestamp: Date.now() }));
+
+            alert('¡Pedido enviado con éxito a la caja!');
+            cart = [];
+            document.getElementById('client-info').value = '';
+            renderCart();
+        }
+
+        // Escuchar si el Admin actualiza inventarios
+        apiChannel.onmessage = (event) => {
+            if (event.data.type === 'INVENTORY_UPDATED') {
+                inventory = event.data.payload;
+                renderCatalog();
+            }
+        };
+
+        // Escuchar cambios de localStorage en otras pestañas
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'rest_inventory') {
+                loadInventory();
+            }
+        });
+
+        loadInventory();
+    </script>
 </body>
 </html>
